@@ -5,3 +5,4 @@ EX: 4
 FILES:
 README
 Makefile
+VirtualMemory.cpp - out implementation of the functions
