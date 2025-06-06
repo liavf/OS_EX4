@@ -16,11 +16,11 @@ typedef struct {
 static void clearFrame(uint64_t frameIndex);
 static void parseAddress(uint64_t virtualAddress, word_t indices[]);
 static uint64_t computeCyclicDistance(uint64_t pageA, uint64_t pageB);
-static void unlinkFromParent(uint64_t parentFrame, uint64_t childFrame);
+static void unlinkFromParent(word_t parentFrame, word_t childFrame);
 static uint64_t traverseTree(uint64_t virtualAddress);
-static word_t findFreeOrEvictFrame(uint64_t targetPage, uint64_t avoidFrame);
+static word_t findFreeOrEvictFrame(uint64_t targetPage, word_t avoidFrame);
 static void dfsSearch(word_t currentFrame, int depth, uint64_t targetPage,
-                      uint64_t avoidFrame, word_t parentFrame, word_t parentOffset,
+                      word_t avoidFrame, word_t parentFrame, word_t parentOffset,
                       uint64_t currentPageNumber, FrameSearchResult* result);
 
 
@@ -88,7 +88,7 @@ static uint64_t computeCyclicDistance(uint64_t pageA, uint64_t pageB) {
     return (diff < (NUM_PAGES - diff)) ? diff : (NUM_PAGES - diff);
 }
 
-static void unlinkFromParent(uint64_t parentFrame, uint64_t childFrame) {
+static void unlinkFromParent(word_t parentFrame, word_t childFrame) {
     for (uint64_t offset = 0; offset < PAGE_SIZE; ++offset) {
         word_t entry;
         PMread(parentFrame * PAGE_SIZE + offset, &entry);
@@ -137,7 +137,7 @@ static uint64_t traverseTree(uint64_t virtualAddress) {
 }
 
 // Find a free frame or select a frame to evict based on cyclic distance
-static word_t findFreeOrEvictFrame(uint64_t targetPage, uint64_t avoidFrame) {
+static word_t findFreeOrEvictFrame(uint64_t targetPage, word_t avoidFrame) {
     FrameSearchResult result = {0};
     dfsSearch(0, 0, targetPage, avoidFrame, 0, 0, 0, &result);
 
@@ -168,7 +168,7 @@ static word_t findFreeOrEvictFrame(uint64_t targetPage, uint64_t avoidFrame) {
 
 // recursive DFS search through page table tree and update result accordingly
 static void dfsSearch(word_t currentFrame, int depth, uint64_t targetPage,
-                      uint64_t avoidFrame, word_t parentFrame, word_t parentOffset,
+                      word_t avoidFrame, word_t parentFrame, word_t parentOffset,
                       uint64_t currentPageNumber, FrameSearchResult* result) {
 
     if (currentFrame > result->maxUsedFrame) {
