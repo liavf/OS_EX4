@@ -117,12 +117,10 @@ static uint64_t traverseTree(uint64_t virtualAddress) {
         word_t entry;
         PMread(currentFrame * PAGE_SIZE + indices[level], &entry);
         if (entry == 0) { // PAGE FAULT
-//            printf("Level: %d CurrentFrame: %llu\n", level, currentFrame);
             word_t newFrame = findFreeOrEvictFrame(pageNumber, currentFrame);
             if (level < TABLES_DEPTH - 1) { // not a leaf - create table
                 clearFrame(newFrame);
             } else { // leaf - restore page
-//                printf("Restoring: frame=%llu pageNum=%llu\n", newFrame, pageNumber);
                 PMrestore(newFrame, pageNumber);
             }
 
@@ -144,13 +142,11 @@ static word_t findFreeOrEvictFrame(uint64_t targetPage, word_t avoidFrame) {
     // Priority 1: Empty table found
     if (result.emptyTable != 0) {
         unlinkFromParent(result.emptyTableParent, result.emptyTable);
-//        printf("Using empty table frame %llu\n", result.emptyTable);
         return result.emptyTable;
     }
 
     // Priority 2: Free frame available
     if (result.maxUsedFrame + 1 < NUM_FRAMES) {
-//        printf("Using free frame %llu\n", result.maxUsedFrame + 1);
         return result.maxUsedFrame + 1;
     }
 
@@ -160,7 +156,6 @@ static word_t findFreeOrEvictFrame(uint64_t targetPage, word_t avoidFrame) {
     PMread(result.bestEvictParent * PAGE_SIZE + result.bestEvictOffset, &victimFrame);
     PMevict(victimFrame, result.bestEvictPageNumber);
     PMwrite(result.bestEvictParent * PAGE_SIZE + result.bestEvictOffset, 0);
-//    printf("Evicting frame=%llu pageNum=%llu\n", victimFrame, result.bestEvictPageNumber);
 
     return victimFrame;
 }
@@ -173,18 +168,14 @@ static void dfsSearch(word_t currentFrame, int depth, uint64_t targetPage,
 
     if (currentFrame > result->maxUsedFrame) {
         result->maxUsedFrame = currentFrame;
-//        printf("DFS: maxUsedFrame updated to %llu\n", currentFrame);
     }
 
 //    if (currentFrame == avoidFrame) {
-////        printf("DFS: avoiding frame %llu\n", currentFrame);
 //        return; // skip this frame
 //    }
 
     if (depth == TABLES_DEPTH) {
         // leaf = page frame reached: compute cyclic distance
-//        printf("DFS: leaf frame=%llu pageNum=%llu\n",
-//               currentFrame, currentPageNumber);
         uint64_t distance = computeCyclicDistance(targetPage, currentPageNumber);
         if (distance > result->bestDistance) {
             result->bestDistance = distance;
@@ -192,7 +183,6 @@ static void dfsSearch(word_t currentFrame, int depth, uint64_t targetPage,
             result->bestEvictParent = parentFrame;
             result->bestEvictOffset = parentOffset;
             result->bestEvictPageNumber = currentPageNumber;
-//            printf("DFS: candidate eviction: frame=%llu pageNum=%llu\n", currentFrame, currentPageNumber);
         }
         return;
     }
@@ -214,6 +204,5 @@ static void dfsSearch(word_t currentFrame, int depth, uint64_t targetPage,
     if (isEmpty && currentFrame != 0 && currentFrame != avoidFrame && result->emptyTable == 0) {
         result->emptyTable = currentFrame;
         result->emptyTableParent = parentFrame;
-//        printf("DFS: found empty table at frame %llu\n", currentFrame);
     }
 }
