@@ -176,14 +176,14 @@ static void dfsSearch(word_t currentFrame, int depth, uint64_t targetPage,
 //        printf("DFS: maxUsedFrame updated to %llu\n", currentFrame);
     }
 
-    if (currentFrame == avoidFrame) {
-//        printf("DFS: avoiding frame %llu\n", currentFrame);
-        return; // skip this frame
-    }
+//    if (currentFrame == avoidFrame) {
+////        printf("DFS: avoiding frame %llu\n", currentFrame);
+//        return; // skip this frame
+//    }
 
     if (depth == TABLES_DEPTH) {
         // leaf = page frame reached: compute cyclic distance
-         printf("DFS: leaf frame=%llu pageNum=%llu\n",
+        printf("DFS: leaf frame=%llu pageNum=%llu\n",
                currentFrame, currentPageNumber);
         uint64_t distance = computeCyclicDistance(targetPage, currentPageNumber);
         if (distance > result->bestDistance) {
